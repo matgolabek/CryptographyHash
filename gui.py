@@ -1920,7 +1920,7 @@ class ContentWhirlpool(MDStackLayout):
             tooltip_text="Whirlpool was designed by Vincent Rijmen and Paulo S. L. M. Barreto, who first described it in 2000. \n" \
             "Whirlpool is a hash designed after the Square block cipher, and is considered to be in that family of block cipher functions and also is based on a substantially modified Advanced Encryption Standard (AES). \n" \
             "Whirlpool takes a message of any length less than 2256 bits and returns a 512-bit message digest. \n" \
-            "Internal structure: \n" \
+            "\nInternal structure: \n" \
             " - The input message is split into 512-bit blocks.\n" \
             " - Each block is processed through a 10-round transformation.\n" \
             " - Each round includes: \n" \
@@ -2052,9 +2052,10 @@ class ContentBLAKE(MDStackLayout):
             icon="information-outline",
             tooltip_text="BLAKE2 was designed by Jean-Philippe Aumasson, Samuel Neves, Zooko Wilcox-O'Hearn, and Christian Winnerlein. It was published in 2012 as an improved version of the original BLAKE algorithm, which was a finalist in the NIST SHA-3 competition.\n"
                         "BLAKE2 is a cryptographic hash function optimized for speed, security, and simplicity. It is faster than MD5, SHA-1, and SHA-2, while providing at least as much security.\n"
-                        "BLAKE2 comes in two main variants:\n"
+                        "\nBLAKE2 comes in two main variants:\n"
                         " - BLAKE2b: optimized for 64-bit platforms, produces digests up to 512 bits.\n"
-                        " - BLAKE2s: optimized for 8- to 32-bit platforms, produces digests up to 256 bits.\n"
+                        " - BLAKE2s: optimized for 8- to 32-bit platforms, produces digests up to 256 bits.\n" \
+                        "\n"
                         "Internal structure:\n"
                         " - Based on the HAIFA construction and the local wide-pipe principle.\n"
                         " - Uses the ChaCha permutation (a variant of the stream cipher) for mixing input.\n"
@@ -2195,6 +2196,295 @@ class ContentBLAKE(MDStackLayout):
         if value:
             self.version = checkbox.label_text  # MDLabel is the second widget in layout
 
+class TabSHA(MDStackLayout, MDTabsBase):
+    def __init__(self, orientation: str ='lr-tb', **kwargs):
+        super().__init__(**kwargs)
+        self.title="SHA"
+
+        scroll = MDScrollView(do_scroll_x=True, do_scroll_y=True)
+        content = ContentSHA(orientation=orientation)
+
+        scroll.add_widget(content)
+        self.add_widget(scroll)
+
+
+class ContentSHA(MDStackLayout):
+    def __init__(self, orientation: str ='lr-tb', **kwargs):
+        super().__init__(**kwargs)
+        self.orientation = 'lr-tb'
+        self.adaptive_height = True
+        self.padding = 20
+        # self.adaptive_width = True # RAM eater
+
+        self.widget_height = 0.03
+        self.disable_calc = False
+
+        self.alg = '0' * 128
+        self.version = 'sha224'
+
+        hello_label = MDLabel(text=f"SHA algorithms", font_style="H4", size_hint=(0.55, self.widget_height * 4), halign="right", valign="middle")
+        hello_label.bind(size=hello_label.setter("text_size"))
+        self.add_widget(hello_label)
+
+        hello_info = InfoTooltipButton(
+            icon="information-outline",
+            tooltip_text="The SHA (Secure Hash Algorithm) family is a set of cryptographic hash functions developed by the U.S. National Institute of Standards and Technology (NIST).\n"
+                        "SHA algorithms are widely used for data integrity, digital signatures, and cryptographic protocols.\n"
+                        "\n"
+                        "The family includes:\n"
+                        " - SHA-1 (1995): Produces a 160-bit hash value. It is now considered insecure due to collision attacks and is deprecated for cryptographic use.\n"
+                        " - SHA-2 (2001): Includes SHA-224, SHA-256, SHA-384, and SHA-512. These functions are secure and widely used in applications like TLS, blockchain, and digital certificates.\n"
+                        " - SHA-3 (2015): Based on the Keccak algorithm, SHA-3 provides alternatives to SHA-2 with the same output sizes (224, 256, 384, 512 bits), but uses a completely different internal structure.\n"
+                        "\n"
+                        "Internal structure:\n"
+                        " - SHA-1 and SHA-2 are based on the Merkle-Damgård construction and use bitwise logical operations, modular addition, and message expansion.\n"
+                        " - SHA-3 uses a sponge construction with the Keccak-f permutation operating on a 1600-bit state arranged in a 5x5x64-bit cube.\n"
+                        "\n"
+                        "SHA algorithms are standardized in:\n"
+                        " - FIPS PUB 180-4 (for SHA-1 and SHA-2)\n"
+                        " - FIPS PUB 202 (for SHA-3 and SHAKE)\n"
+                        "\n"
+                        "SHA-2 remains the most widely deployed secure hash function, while SHA-3 and SHAKE offer modern alternatives with different internal structures and flexible output sizes.",
+            size_hint=(None, self.widget_height * 4),
+            halign='left'
+        )
+        self.add_widget(hello_info)
+
+        self.add_widget(MDIconButton(
+            icon="blank",
+            icon_color=(1, 1, 1, 0),
+            size_hint=(0.35, self.widget_height * 4),
+        ))
+
+        self.add_widget(MDIconButton(icon="theme-light-dark", size_hint=(None, self.widget_height * 4), on_release=self.toggle_theme, halign='right'))
+
+
+        self.version = 'blake2b'
+
+        checkbox = MDCheckbox(group="sha", size_hint=(0.25 * 0.3, self.widget_height * 2))
+        checkbox.active = True
+        checkbox.label_text = 'sha224'
+        checkbox.bind(active=self.on_checkbox_active)
+
+        label = MDLabel(
+            text="SHA-2 (224)",
+            halign='left',
+            valign = 'top',
+            size_hint=(0.25 * 0.7, self.widget_height * 2)
+        )
+
+        self.add_widget(checkbox)
+        self.add_widget(label)
+
+        checkbox = MDCheckbox(group="sha", size_hint=(0.25 * 0.3, self.widget_height * 2))
+        checkbox.label_text = 'sha256'
+        checkbox.bind(active=self.on_checkbox_active)
+
+        label = MDLabel(
+            text='SHA-2 (256)',
+            halign='left',
+            valign = 'top',
+            size_hint=(0.25 * 0.7, self.widget_height * 2)
+        )
+
+        self.add_widget(checkbox)
+        self.add_widget(label)
+
+        checkbox = MDCheckbox(group="sha", size_hint=(0.25 * 0.3, self.widget_height * 2))
+        checkbox.label_text = 'sha384'
+        checkbox.bind(active=self.on_checkbox_active)
+
+        label = MDLabel(
+            text="SHA-2 (384)",
+            halign='left',
+            valign = 'top',
+            size_hint=(0.25 * 0.7, self.widget_height * 2)
+        )
+
+        self.add_widget(checkbox)
+        self.add_widget(label)
+
+        checkbox = MDCheckbox(group="sha", size_hint=(0.25 * 0.3, self.widget_height * 2))
+        checkbox.label_text = 'sha512'
+        checkbox.bind(active=self.on_checkbox_active)
+
+        label = MDLabel(
+            text='SHA-2 (512)',
+            halign='left',
+            valign = 'top',
+            size_hint=(0.25 * 0.7, self.widget_height * 2)
+        )
+
+        self.add_widget(checkbox)
+        self.add_widget(label)
+
+        checkbox = MDCheckbox(group="sha", size_hint=(0.25 * 0.3, self.widget_height * 4))
+        checkbox.label_text = 'sha3_224'
+        checkbox.bind(active=self.on_checkbox_active)
+
+        label = MDLabel(
+            text="SHA-3 (224)",
+            halign='left',
+            valign = 'top',
+            size_hint=(0.25 * 0.7, self.widget_height * 4)
+        )
+
+        self.add_widget(checkbox)
+        self.add_widget(label)
+
+        checkbox = MDCheckbox(group="sha", size_hint=(0.25 * 0.3, self.widget_height * 4))
+        checkbox.label_text = 'sha3_256'
+        checkbox.bind(active=self.on_checkbox_active)
+
+        label = MDLabel(
+            text='SHA-3 (256)',
+            halign='left',
+            valign = 'top',
+            size_hint=(0.25 * 0.7, self.widget_height * 4)
+        )
+
+        self.add_widget(checkbox)
+        self.add_widget(label)
+
+        checkbox = MDCheckbox(group="sha", size_hint=(0.25 * 0.3, self.widget_height * 4))
+        checkbox.label_text = 'sha3_384'
+        checkbox.bind(active=self.on_checkbox_active)
+
+        label = MDLabel(
+            text="SHA-3 (384)",
+            halign='left',
+            valign = 'top',
+            size_hint=(0.25 * 0.7, self.widget_height * 4)
+        )
+
+        self.add_widget(checkbox)
+        self.add_widget(label)
+
+        checkbox = MDCheckbox(group="sha", size_hint=(0.25 * 0.3, self.widget_height * 4))
+        checkbox.label_text = 'sha3_512'
+        checkbox.bind(active=self.on_checkbox_active)
+
+        label = MDLabel(
+            text='SHA-3 (512)',
+            halign='left',
+            valign = 'top',
+            size_hint=(0.25 * 0.7, self.widget_height * 4)
+        )
+
+        self.add_widget(checkbox)
+        self.add_widget(label)
+
+        mess_row = MDStackLayout(orientation='lr-tb', size_hint=(1, self.widget_height))
+        mess_row.add_widget(MDLabel(text="Enter message to encrypt:", halign='left', size_hint=(0.1, self.widget_height)))
+        mess_info = InfoTooltipButton(
+            icon="information-outline",
+            tooltip_text="The output digest size will be same length every time, regardless the length of this message.",
+            size_hint=(None, self.widget_height * 4)
+        )
+        mess_row.add_widget(mess_info)
+        self.add_widget(mess_row)
+        self.message = MDTextField(text="Password to hash", size_hint=(0.8, self.widget_height))
+        self.add_widget(self.message)
+        
+        self.add_widget(MDRaisedButton(text="Enter", on_press=self.initialize, size_hint=(0.2, self.widget_height)))
+
+
+        self.add_widget(MDRaisedButton(text="Run all",
+                               on_press=self.run_all,
+                               size_hint=(1, self.widget_height)))
+
+        final_row = MDStackLayout(orientation='lr-tb', size_hint=(1, self.widget_height * 6))
+        final_row.add_widget(MDLabel(text="Final output:", halign='left', size_hint=(0.06, self.widget_height * 6)))
+        final_info = InfoTooltipButton(
+            icon="information-outline",
+            tooltip_text="The final state displayed in little-endian (as typical).",
+            size_hint=(None, self.widget_height * 6)
+        )
+        final_row.add_widget(final_info)
+        self.add_widget(final_row)
+        
+        r = self.alg
+        self.r_l = [None for _ in range(128)]
+        for i in range(128):
+            self.r_l[i] = MDTextField(text=r[i], size_hint=(1/32, self.widget_height), multiline=False,  on_text_validate=self.update_out, readonly=True)
+            self.add_widget(self.r_l[i])
+
+    def initialize(self, instance):
+        try:
+            self.alg = hashlib.new(self.version, self.message.text.encode()).hexdigest()
+            print(len(self.alg))
+
+        except ValueError:
+            self.show_popup("The message can't be empty.")
+            return
+        self.disable_calc = False
+
+    def update_out(self, instance):
+        r = self.alg
+        if len(r) == 128:
+            for i in range(128):
+                self.r_l[i].text = r[i]
+        elif len(r) == 96:
+            for i in range(96):
+                self.r_l[i % 32].text = '0'
+                self.r_l[i + 32].text = r[i]
+        elif len(r) == 64:
+            for i in range(64):
+                self.r_l[i].text = '0'
+                self.r_l[i + 64].text = r[i]
+        elif len(r) == 56:
+            for i in range(128):
+                if i < 72:
+                    self.r_l[i].text = '0'
+                else:
+                    self.r_l[i].text = r[i]
+
+    def run_all(self, instance):
+        if self.disable_calc:
+            self.show_popup("Calculations have been completed. Type a new password to hash and press enter to run again.")
+            return
+        if self.alg == '0' * 128:
+            self.show_popup("The message hasn't been acknowledged. Type a new password to hash and press enter to start.")
+            return
+        r = self.alg
+        r = self.alg
+        if len(r) == 128:
+            for i in range(128):
+                self.r_l[i].text = r[i]
+        elif len(r) == 96:
+            for i in range(96):
+                self.r_l[i % 32].text = '0'
+                self.r_l[i + 32].text = r[i]
+        elif len(r) == 64:
+            for i in range(64):
+                self.r_l[i].text = '0'
+                self.r_l[i + 64].text = r[i]
+        elif len(r) == 56:
+            for i in range(128):
+                if i < 72:
+                    self.r_l[i].text = '0'
+                else:
+                    self.r_l[i].text = r[i - 72]
+    
+    def show_popup(self, label_text=str):
+        self.dialog = MDDialog(
+            title='Warning',
+            text=label_text,
+            buttons=[
+                MDFlatButton(text="OK", on_release=self.close_popup)
+            ],
+        )
+        self.dialog.open()
+
+    def close_popup(self, *args):
+        self.dialog.dismiss()
+
+    def toggle_theme(self, *args):
+        self.theme_cls.theme_style = "Dark" if self.theme_cls.theme_style == "Light" else "Light"
+
+    def on_checkbox_active(self, checkbox, value):
+        if value:
+            self.version = checkbox.label_text  # MDLabel is the second widget in layout
 
 
 class InfoTooltipButton(MDIconButton, MDTooltip):
@@ -2216,6 +2506,7 @@ class MyTabbedPanel(MDBoxLayout):
         self.tabs.add_widget(TabRIPEMD())
         self.tabs.add_widget(TabWhirlpool())
         self.tabs.add_widget(TabBLAKE())
+        self.tabs.add_widget(TabSHA())
 
 
 class MyApp(MDApp):
