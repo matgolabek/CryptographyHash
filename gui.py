@@ -20,6 +20,7 @@ import md4
 import md5
 import ripemd160 as ripemd
 import sha1
+import hashlib
 import numpy as np
 
 class WelocomePanel(MDBoxLayout, MDTabsBase):
@@ -1885,6 +1886,137 @@ class ContentRIPEMD(MDStackLayout):
             instance.text = '[3, 7, 11, 19]'
 
         
+class TabWhirlpool(MDStackLayout, MDTabsBase):
+    def __init__(self, orientation: str ='lr-tb', **kwargs):
+        super().__init__(**kwargs)
+        self.title="Whirlpool"
+
+        scroll = MDScrollView(do_scroll_x=True, do_scroll_y=True)
+        content = ContentWhirlpool(orientation=orientation)
+
+        scroll.add_widget(content)
+        self.add_widget(scroll)
+
+
+class ContentWhirlpool(MDStackLayout):
+    def __init__(self, orientation: str ='lr-tb', **kwargs):
+        super().__init__(**kwargs)
+        self.orientation = 'lr-tb'
+        self.adaptive_height = True
+        self.padding = 20
+        # self.adaptive_width = True # RAM eater
+
+        self.widget_height = 0.03
+        self.disable_calc = False
+
+        self.alg = '0' * 128
+
+        hello_label = MDLabel(text=f"Whirlpool algorithm", font_style="H4", size_hint=(0.55, self.widget_height * 4), halign="right", valign="middle")
+        hello_label.bind(size=hello_label.setter("text_size"))
+        self.add_widget(hello_label)
+
+        hello_info = InfoTooltipButton(
+            icon="information-outline",
+            tooltip_text="Whirlpool was designed by Vincent Rijmen and Paulo S. L. M. Barreto, who first described it in 2000. \n" \
+            "Whirlpool is a hash designed after the Square block cipher, and is considered to be in that family of block cipher functions and also is based on a substantially modified Advanced Encryption Standard (AES). \n" \
+            "Whirlpool takes a message of any length less than 2256 bits and returns a 512-bit message digest. \n" \
+            "Internal structure: \n" \
+            " - The input message is split into 512-bit blocks.\n" \
+            " - Each block is processed through a 10-round transformation.\n" \
+            " - Each round includes: \n" \
+            "    - SubBytes - byte-wise substitution using a fixed 8-bit S-box.\n" \
+            "    - ShiftColumns - cyclic permutation of columns.\n" \
+            "    - MixRows - diffusion step using a fixed binary matrix over GF(2^8)\n" \
+            "    - AddRoundKey - XOR with round key derived from the message block and round constants.",
+            size_hint=(None, self.widget_height * 4),
+            halign='left'
+        )
+        self.add_widget(hello_info)
+
+        self.add_widget(MDIconButton(
+            icon="blank",
+            icon_color=(1, 1, 1, 0),
+            size_hint=(0.35, self.widget_height * 4),
+        ))
+
+        self.add_widget(MDIconButton(icon="theme-light-dark", size_hint=(None, self.widget_height * 4), on_release=self.toggle_theme, halign='right'))
+
+        mess_row = MDStackLayout(orientation='lr-tb', size_hint=(1, self.widget_height))
+        mess_row.add_widget(MDLabel(text="Enter message to encrypt:", halign='left', size_hint=(0.1, self.widget_height)))
+        mess_info = InfoTooltipButton(
+            icon="information-outline",
+            tooltip_text="The output digest size will be same length every time, regardless the length of this message.",
+            size_hint=(None, self.widget_height * 4)
+        )
+        mess_row.add_widget(mess_info)
+        self.add_widget(mess_row)
+        self.message = MDTextField(text="Password to hash", size_hint=(0.8, self.widget_height))
+        self.add_widget(self.message)
+        
+        self.add_widget(MDRaisedButton(text="Enter", on_press=self.initialize, size_hint=(0.2, self.widget_height)))
+
+
+        self.add_widget(MDRaisedButton(text="Run all",
+                               on_press=self.run_all,
+                               size_hint=(1, self.widget_height)))
+
+        final_row = MDStackLayout(orientation='lr-tb', size_hint=(1, self.widget_height * 6))
+        final_row.add_widget(MDLabel(text="Final output:", halign='left', size_hint=(0.06, self.widget_height * 6)))
+        final_info = InfoTooltipButton(
+            icon="information-outline",
+            tooltip_text="The final state displayed in little-endian (as typical).",
+            size_hint=(None, self.widget_height * 6)
+        )
+        final_row.add_widget(final_info)
+        self.add_widget(final_row)
+        
+        r = self.alg
+        self.r_l = [None for _ in range(128)]
+        for i in range(128):
+            self.r_l[i] = MDTextField(text=r[i], size_hint=(1/32, self.widget_height), multiline=False,  on_text_validate=self.update_out, readonly=True)
+            self.add_widget(self.r_l[i])
+
+    def initialize(self, instance):
+        try:
+            self.alg = hashlib.new('whirlpool', self.message.text.encode()).hexdigest()
+
+        except ValueError:
+            self.show_popup("The message can't be empty.")
+            return
+        self.disable_calc = False
+
+    def update_out(self, instance):
+        r = self.alg
+        for i in range(128):
+            self.r_l[i].text = r[i]
+
+    def run_all(self, instance):
+        if self.disable_calc:
+            self.show_popup("Calculations have been completed. Type a new password to hash and press enter to run again.")
+            return
+        if self.alg == '0' * 128:
+            self.show_popup("The message hasn't been acknowledged. Type a new password to hash and press enter to start.")
+            return
+        r = self.alg
+        for i in range(128):
+            self.r_l[i].text = r[i]
+    
+    def show_popup(self, label_text=str):
+        self.dialog = MDDialog(
+            title='Warning',
+            text=label_text,
+            buttons=[
+                MDFlatButton(text="OK", on_release=self.close_popup)
+            ],
+        )
+        self.dialog.open()
+
+    def close_popup(self, *args):
+        self.dialog.dismiss()
+
+    def toggle_theme(self, *args):
+        self.theme_cls.theme_style = "Dark" if self.theme_cls.theme_style == "Light" else "Light"
+
 
 
 
@@ -1905,6 +2037,7 @@ class MyTabbedPanel(MDBoxLayout):
         self.tabs.add_widget(TabMD5())
         self.tabs.add_widget(TabSHA1())
         self.tabs.add_widget(TabRIPEMD())
+        self.tabs.add_widget(TabWhirlpool())
 
 
 
