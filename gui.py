@@ -51,7 +51,7 @@ class WelocomePanel(MDBoxLayout, MDTabsBase):
         scroll = MDScrollView(size_hint_y=0.8, md_bg_color=self.theme_cls.primary_color)
         definition = MDLabel(
             text=(
-                "[b]Definition:[/b]\n"
+                "[b]What is a hash function?[/b]\n"
                 "A hash function is any function that can be used to map data of arbitrary size "
                 "to fixed-size values. Hash functions are widely used in computer science, "
                 "especially in cryptography, for tasks such as digital signatures and checksums.\n"
@@ -530,7 +530,11 @@ class ContentMD5(MDStackLayout):
 
         hello_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="aaabbcc",
+            tooltip_text="Message Digest 5 was designed by Ronald Rivest in 1991 to replace an earlier and less secure hash function MD4.\n" \
+                         "However it has been found to suffer from extensive vulnerabilities\n." \
+                         "It remains suitable for other non-cryptographic purposes, for example for determining the partition for a particular key in a partitioned database, \n"
+                         "and may be preferred due to lower computational requirements than more recent Secure Hash Algorithms. \n" \
+                         "Main change to the MD4 is fourth round and executed functions: (x&y | ~x&z), (x&z | y&~z), (x^y^z), (y ^ x|~z)",
             size_hint=(None, self.widget_height * 4),
             halign='left'
         )
@@ -550,9 +554,11 @@ class ContentMD5(MDStackLayout):
         chain_row.add_widget(MDLabel(text="Enter chain constants:", size_hint=(0.09, self.widget_height)))
         chain_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="lalalala",
+            tooltip_text="The chain constants are used to initialize operating registers a, b, c, d and output registers h1, h2, h3, h4\n" \
+            "The values of third and fourth constants are reversed respectively to second and first number.",
             size_hint=(None, self.widget_height * 4)
         )
+
         chain_row.add_widget(chain_info)
         self.add_widget(chain_row)
         self.add_widget(MDLabel(text="h1:", halign='left', size_hint=(0.25, self.widget_height)))
@@ -580,7 +586,8 @@ class ContentMD5(MDStackLayout):
         add_row.add_widget(MDLabel(text="Select additive constant type:", halign='left', size_hint=(0.11, self.widget_height)))
         add_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="bebebbe",
+            tooltip_text="Different to MD4, the MD5 additive constants are unique not only for each round, but also for each iteration. \n" \
+            "Originally they are stated as abs(sin(j)) for j from 1 to 64.",
             size_hint=(None, self.widget_height * 4)
         )
         add_row.add_widget(add_info)
@@ -637,7 +644,7 @@ class ContentMD5(MDStackLayout):
         order_row.add_widget(MDLabel(text="Enter order lists:", halign='left', size_hint=(0.08, self.widget_height)))
         order_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="cycycyccycy",
+            tooltip_text="In MD5 there are 4 rounds of calculations, so 4 permutation arrays.",
             size_hint=(None, self.widget_height * 4)
         )
         order_row.add_widget(order_info)
@@ -670,7 +677,7 @@ class ContentMD5(MDStackLayout):
         shuffle_row.add_widget(MDLabel(text="Enter shuffle lists:", halign='left', size_hint=(0.08, self.widget_height)))
         shuffle_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="dididididi",
+            tooltip_text="Also 4 shuffle arrays.",
             size_hint=(None, self.widget_height * 4)
         )
         shuffle_row.add_widget(shuffle_info)
@@ -702,7 +709,7 @@ class ContentMD5(MDStackLayout):
         mess_row.add_widget(MDLabel(text="Enter message to encrypt:", halign='left', size_hint=(0.1, self.widget_height)))
         mess_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="eeeeeeeeee",
+            tooltip_text="The output digest size will be same length every time, regardless the length of this message.",
             size_hint=(None, self.widget_height * 4)
         )
         mess_row.add_widget(mess_info)
@@ -724,7 +731,7 @@ class ContentMD5(MDStackLayout):
         reg_row.add_widget(MDLabel(text="\nRegisters:", halign='left', size_hint=(0.05, self.widget_height)))
         reg_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="ffffffff",
+            tooltip_text="The operating registers. Keeping track of what's happening inside.",
             size_hint=(None, self.widget_height * 24)
         )
         reg_row.add_widget(reg_info)
@@ -755,7 +762,8 @@ class ContentMD5(MDStackLayout):
         final_row.add_widget(MDLabel(text="Final output:", halign='left', size_hint=(0.06, self.widget_height)))
         final_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="ggggggggggggggg",
+            tooltip_text="The final state displayed in little-endian (as typical).\n" \
+            "After each transformation the output registers update (H1, H2, H3, H4) <- (H1 + A, H2 + B, H3 + C, H4 + D)",
             size_hint=(None, self.widget_height * 4)
         )
         final_row.add_widget(final_info)
@@ -980,7 +988,11 @@ class ContentSHA1(MDStackLayout):
 
         hello_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="aaabbcc",
+            tooltip_text="Secure Hash Algorithm 1 was designed in 1995 by the United States National Security Agency. \n" \
+            "Since 2005, SHA-1 has not been considered secure against well-funded opponents. \n" \
+            "SHA-1 produces a message digest based on principles similar to those used in the design of the MD4\\5 message digest algorithms, but generates a larger hash value (160 bits vs. 128 bits). \n" \
+            "Similarly to MD5 there are 4 rounds with functions: (x&y | ~x&z), (x^y^z), (x&y ^ x&z ^ y&z), (x^y^z)," \
+            "but the shuffle and order arrays are not in use.",
             size_hint=(None, self.widget_height * 4),
             halign='left'
         )
@@ -1000,7 +1012,7 @@ class ContentSHA1(MDStackLayout):
         chain_row.add_widget(MDLabel(text="Enter chain constants:", size_hint=(0.09, self.widget_height)))
         chain_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="lalalala",
+            tooltip_text="As there is a 160 bit output, the fifth chain constant has been introduced.",
             size_hint=(None, self.widget_height * 4)
         )
         chain_row.add_widget(chain_info)
@@ -1035,7 +1047,8 @@ class ContentSHA1(MDStackLayout):
         add_row.add_widget(MDLabel(text="Enter additive constants:", halign='left', size_hint=(0.1, self.widget_height)))
         add_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="bebebbe",
+            tooltip_text="These constants were hand-chosen constants, likely for cryptographic properties and balance in bitwise logic,\n" \
+            "but not mathematically derived from irrational numbers (like in MD algorithms).",
             size_hint=(None, self.widget_height * 4)
         )
         add_row.add_widget(add_info)
@@ -1066,7 +1079,7 @@ class ContentSHA1(MDStackLayout):
         mess_row.add_widget(MDLabel(text="Enter message to encrypt:", halign='left', size_hint=(0.1, self.widget_height)))
         mess_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="eeeeeeeeee",
+            tooltip_text="The output digest size will be same length every time, regardless the length of this message.",
             size_hint=(None, self.widget_height * 4)
         )
         mess_row.add_widget(mess_info)
@@ -1088,7 +1101,7 @@ class ContentSHA1(MDStackLayout):
         reg_row.add_widget(MDLabel(text="\nRegisters:", halign='left', size_hint=(0.05, self.widget_height)))
         reg_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="ffffffff",
+            tooltip_text="The operating registers. Keeping track of what's happening inside.",
             size_hint=(None, self.widget_height * 30)
         )
         reg_row.add_widget(reg_info)
@@ -1124,7 +1137,7 @@ class ContentSHA1(MDStackLayout):
         final_row.add_widget(MDLabel(text="Final output:", halign='left', size_hint=(0.06, self.widget_height)))
         final_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="ggggggggggggggg",
+            tooltip_text="The final state displayed in little-endian (as typical).",
             size_hint=(None, self.widget_height * 4)
         )
         final_row.add_widget(final_info)
@@ -1281,7 +1294,11 @@ class ContentRIPEMD(MDStackLayout):
 
         hello_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="aaabbcc",
+            tooltip_text="RIPE Message Digest is a family of cryptographic hash functions developed between 1992 and 1996. RIPEMD-160 is the most common. They were designed to be more durable than MD4\\5. \n" \
+                         "The original RIPEMD, as well as RIPEMD-128, is not considered secure because 128-bit result is too small and also (for the original RIPEMD) because of design weaknesses.\n" \
+                         "The 256- and 320-bit versions of RIPEMD provide the same level of security as RIPEMD-128 and RIPEMD-160, respectively; they are designed for applications where the security level is sufficient but longer hash result is necessary. \n" \
+                         "While RIPEMD functions are less popular than SHA-1 and SHA-2, they are used, among others, in Bitcoin and other cryptocurrencies based on Bitcoin. \n" \
+                         "In this algorithm, each data block is computed in parallel by left and right path, which differ in constants.",
             size_hint=(None, self.widget_height * 4),
             halign='left'
         )
@@ -1301,7 +1318,7 @@ class ContentRIPEMD(MDStackLayout):
         chain_row.add_widget(MDLabel(text="Enter chain constants:", size_hint=(0.09, self.widget_height)))
         chain_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="lalalala",
+            tooltip_text="As there is a 160 bit output, the fifth chain constant is needed.",
             size_hint=(None, self.widget_height * 4)
         )
         chain_row.add_widget(chain_info)
@@ -1331,12 +1348,12 @@ class ContentRIPEMD(MDStackLayout):
         self.h5_ti = MDTextField(text=h5_def, multiline=False, size_hint=(0.2, self.widget_height), on_text_validate=self.update_chain_const)
         self.add_widget(self.h5_ti)
 
-        # Additivie constaints L
+        # Additivie constants L
         add_row = MDStackLayout(orientation='lr-tb', size_hint=(1, self.widget_height))
         add_row.add_widget(MDLabel(text="Enter additive constants left:", halign='left', size_hint=(0.11, self.widget_height)))
         add_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="bebebbe",
+            tooltip_text="The left constants are respectively squre roots of 0, 2, 3, 5, 7 (First prime numbers + 0).",
             size_hint=(None, self.widget_height * 4)
         )
         add_row.add_widget(add_info)
@@ -1373,7 +1390,7 @@ class ContentRIPEMD(MDStackLayout):
         add_row.add_widget(MDLabel(text="Enter additive constants right:", halign='left', size_hint=(0.13, self.widget_height)))
         add_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="bebebbe",
+            tooltip_text="The right constants are respectively cube roots of same numbers: 0, 2, 3, 5, 7.",
             size_hint=(None, self.widget_height * 4)
         )
         add_row.add_widget(add_info)
@@ -1410,7 +1427,7 @@ class ContentRIPEMD(MDStackLayout):
         order_row.add_widget(MDLabel(text="Enter order lists left:", halign='left', size_hint=(0.08, self.widget_height)))
         order_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="cycycyccycy",
+            tooltip_text="Permutations",
             size_hint=(None, self.widget_height * 4)
         )
         order_row.add_widget(order_info)
@@ -1448,7 +1465,7 @@ class ContentRIPEMD(MDStackLayout):
         order_row.add_widget(MDLabel(text="Enter order lists left:", halign='left', size_hint=(0.08, self.widget_height)))
         order_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="cycycyccycy",
+            tooltip_text="Permutations",
             size_hint=(None, self.widget_height * 4)
         )
         order_row.add_widget(order_info)
@@ -1487,7 +1504,7 @@ class ContentRIPEMD(MDStackLayout):
         shuffle_row.add_widget(MDLabel(text="Enter shuffle lists left:", halign='left', size_hint=(0.1, self.widget_height)))
         shuffle_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="dididididi",
+            tooltip_text="Random integers to decide by how many to shift",
             size_hint=(None, self.widget_height * 4)
         )
         shuffle_row.add_widget(shuffle_info)
@@ -1525,7 +1542,7 @@ class ContentRIPEMD(MDStackLayout):
         shuffle_row.add_widget(MDLabel(text="Enter shuffle lists right:", halign='left', size_hint=(0.1, self.widget_height)))
         shuffle_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="dididididi",
+            tooltip_text="Random integers to decide by how many to shift",
             size_hint=(None, self.widget_height * 4)
         )
         shuffle_row.add_widget(shuffle_info)
@@ -1562,7 +1579,7 @@ class ContentRIPEMD(MDStackLayout):
         mess_row.add_widget(MDLabel(text="Enter message to encrypt:", halign='left', size_hint=(0.1, self.widget_height)))
         mess_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="eeeeeeeeee",
+            tooltip_text="The output digest size will be same length every time, regardless the length of this message.",
             size_hint=(None, self.widget_height * 4)
         )
         mess_row.add_widget(mess_info)
@@ -1584,7 +1601,7 @@ class ContentRIPEMD(MDStackLayout):
         reg_row.add_widget(MDLabel(text="\nRegisters:", halign='left', size_hint=(0.05, self.widget_height)))
         reg_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="ffffffff",
+            tooltip_text="The operating registers. Keeping track of what's happening inside.",
             size_hint=(None, self.widget_height * 24)
         )
         reg_row.add_widget(reg_info)
@@ -1620,7 +1637,7 @@ class ContentRIPEMD(MDStackLayout):
         final_row.add_widget(MDLabel(text="Final output:", halign='left', size_hint=(0.06, self.widget_height)))
         final_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="ggggggggggggggg",
+            tooltip_text="The final state displayed in little-endian (as typical).",
             size_hint=(None, self.widget_height * 4)
         )
         final_row.add_widget(final_info)
@@ -1897,6 +1914,7 @@ class MyApp(MDApp):
         self.title = "HashFunEdu"
         self.theme_cls.primary_palette = np.random.choice(["Teal", "Amber", "DeepPurple", "Cyan", "Indigo", "Red", "Green"])
         self.theme_cls.theme_style = np.random.choice(["Light", "Dark"])
+        Window.set_icon("pound-box.png")
         Window.maximize()
         return MyTabbedPanel()
     
