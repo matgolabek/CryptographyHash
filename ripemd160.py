@@ -207,9 +207,9 @@ class RIPEMD160:
         return digest.hex()
 
     
-# Example usage:
-RIPEMD160_hash = RIPEMD160('a4567')
-print(RIPEMD160_hash.run_all(False))  # Example usage of the RIPEMD160 class
-import hashlib
+# # Example usage:
+# RIPEMD160_hash = RIPEMD160('a4567')
+# print(RIPEMD160_hash.run_all(False))  # Example usage of the RIPEMD160 class
+# import hashlib
 
-print(hashlib.new('ripemd160', b'a4567').hexdigest())  # Using hashlib for comparison
+# print(hashlib.new('ripemd160', b'a4567').hexdigest())  # Using hashlib for comparison

@@ -22,6 +22,68 @@ import ripemd160 as ripemd
 import sha1
 import numpy as np
 
+class WelocomePanel(MDBoxLayout, MDTabsBase):
+    def __init__(self, orientation: str ='vertical', **kwargs):
+        super().__init__(**kwargs)
+        self.icon='home'
+        self.orientation = orientation
+        self.padding = 20
+        self.spacing = 20
+
+        self.header = MDBoxLayout(size_hint_y=0.2, orientation='vertical')
+        self.header.add_widget(
+            MDLabel(
+                text="Welcome to the Hash Functions Educational App!",
+                halign="center",
+                valign="middle",
+                font_style="H4"
+            )
+        )
+        self.header.add_widget(
+            MDLabel(
+                text="Explore the algorithms listed in the tabs above. Don't forget to see what's hidden under the info icon.",
+                theme_text_color="Hint",
+                halign="center",
+                valign="middle",
+            )
+        )
+
+        scroll = MDScrollView(size_hint_y=0.8, md_bg_color=self.theme_cls.primary_color)
+        definition = MDLabel(
+            text=(
+                "[b]Definition:[/b]\n"
+                "A hash function is any function that can be used to map data of arbitrary size "
+                "to fixed-size values. Hash functions are widely used in computer science, "
+                "especially in cryptography, for tasks such as digital signatures and checksums.\n"
+                "A one-way function is a function for which, given an input x, it is easy to compute "
+                "the value f(x), but given a result y, it is computationally hard to find any x such that f(x) = y. "
+                "When such a function takes messages M of arbitrary length and always produces outputs of fixed length, "
+                "it is referred to as a hash function.\n\n"
+                "In general, one-way hash functions should satisfy the following properties:\n"
+                "- Given a message M, it is easy to compute f(M).\n"
+                "- Given a hash value y = f(M), it is hard to find the original message M.\n"
+                "- Given a message M, it is hard to find a different message M′ such that f(M) = f(M′).\n\n"
+                "These properties make hash functions essential in cryptography, especially in ensuring "
+                "data integrity and authenticity."
+                "In real-world applications, cryptographic hash functions are used to securely store passwords, "
+                "verify file integrity, and form the foundation of digital signatures and blockchain technologies. "
+                "A good hash function should behave like a 'digital fingerprint': even a tiny change in the input "
+                "should produce a completely different output, making it highly sensitive to input variations. "
+                "Moreover, hash functions must be fast, deterministic, and resistant to collision attacks to be suitable "
+                "for security-critical systems."
+            ),
+            markup=True,
+            text_color=(1, 1, 1, 1),
+            valign="top",
+            padding=40
+            # halign="center",
+        )
+        scroll.add_widget(definition)
+
+        self.add_widget(self.header)
+        self.add_widget(scroll)
+
+
 class TabMD4(MDStackLayout, MDTabsBase):
     def __init__(self, orientation: str ='lr-tb', **kwargs):
         super().__init__(**kwargs)
@@ -52,7 +114,17 @@ class ContentMD4(MDStackLayout):
 
         hello_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="aaabbcc",
+            tooltip_text="Message Digest 4 was developed by Ronald Rivest in 1990. The security of MD4 has been severely compromised.\n" \
+            "The first full collision attack against MD4 was published in 1995, and several newer attacks have been published since then.\n" \
+            "As of 2007, an attack can generate collisions in less than two MD4 hash operations. A theoretical preimage attack also exists.\n" \
+            "Operating principle:\n" \
+            " - The message is padded to a multiple of 512 bits.\n" \
+            " - For each 512-bit block, a transformation is applied that calculates a new internal state based on the current state and the block.\n" \
+            " - After processing all blocks, the final state is returned as the result of the function.\n" \
+            " - The transformation consists of rounds during which the following functions are executed: (x&y | ~x&z), (x&y | x&z | y&z), (x^y^z)\n" \
+            " - Each round, beside main function, other operations are also made:\n" \
+            "       t <- (A + f(B, C, D) + X[z[j]] + y[j])" \
+            "       (A, B, C, D) <- (D, t << s[j], B, C)",
             size_hint=(None, self.widget_height * 4),
             halign='left'
         )
@@ -67,12 +139,13 @@ class ContentMD4(MDStackLayout):
         self.add_widget(MDIconButton(icon="theme-light-dark", size_hint=(None, self.widget_height * 4), on_release=self.toggle_theme, halign='right'))
         self.add_widget(MDIconButton(icon="restore", size_hint=(None, self.widget_height * 4), on_release=self.reset_variables))
         
-        # Chain constraints
+        # Chain constants
         chain_row = MDStackLayout(orientation='lr-tb', size_hint=(1, self.widget_height))
         chain_row.add_widget(MDLabel(text="Enter chain constants:", size_hint=(0.09, self.widget_height)))
         chain_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="lalalala",
+            tooltip_text="The chain constants are used to initialize operating registers a, b, c, d and output registers h1, h2, h3, h4\n" \
+            "The values of third and fourth constants are reversed respectively to second and first number.",
             size_hint=(None, self.widget_height * 4)
         )
         chain_row.add_widget(chain_info)
@@ -97,12 +170,14 @@ class ContentMD4(MDStackLayout):
         self.h4_ti = MDTextField(text=h4_def, multiline=False, size_hint=(0.25, self.widget_height), on_text_validate=self.update_chain_const, readonly=True)
         self.add_widget(self.h4_ti)
 
-        # Additivie constaints
+        # Additivie constants
         add_row = MDStackLayout(orientation='lr-tb', size_hint=(1, self.widget_height))
         add_row.add_widget(MDLabel(text="Enter additive constants:", halign='left', size_hint=(0.11, self.widget_height)))
         add_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="bebebbe",
+            tooltip_text="The additive constants adds up to the temporary register.\n" \
+            "Three constants are given, each for one round.\n" \
+            "Originally these constants are 0, square root of 2 and square root of 3.",
             size_hint=(None, self.widget_height * 4)
         )
         add_row.add_widget(add_info)
@@ -128,7 +203,8 @@ class ContentMD4(MDStackLayout):
         order_row.add_widget(MDLabel(text="Enter order lists:", halign='left', size_hint=(0.08, self.widget_height)))
         order_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="cycycyccycy",
+            tooltip_text="Each round there is a different order of taking message block part for computing. \n" \
+            "When setting your own, make sure to do a permutation containing all indices from 0 to 15.",
             size_hint=(None, self.widget_height * 4)
         )
         order_row.add_widget(order_info)
@@ -156,7 +232,7 @@ class ContentMD4(MDStackLayout):
         shuffle_row.add_widget(MDLabel(text="Enter shuffle lists:", halign='left', size_hint=(0.08, self.widget_height)))
         shuffle_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="dididididi",
+            tooltip_text="Also each round the left shift is by other number.",
             size_hint=(None, self.widget_height * 4)
         )
         shuffle_row.add_widget(shuffle_info)
@@ -183,7 +259,7 @@ class ContentMD4(MDStackLayout):
         mess_row.add_widget(MDLabel(text="Enter message to encrypt:", halign='left', size_hint=(0.1, self.widget_height)))
         mess_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="eeeeeeeeee",
+            tooltip_text="The output digest size will be same length every time, regardless the length of this message.",
             size_hint=(None, self.widget_height * 4)
         )
         mess_row.add_widget(mess_info)
@@ -205,7 +281,7 @@ class ContentMD4(MDStackLayout):
         reg_row.add_widget(MDLabel(text="\nRegisters:", halign='left', size_hint=(0.05, self.widget_height)))
         reg_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="ffffffff",
+            tooltip_text="The operating registers. Keeping track of what's happening inside.",
             size_hint=(None, self.widget_height * 24)
         )
         reg_row.add_widget(reg_info)
@@ -236,7 +312,8 @@ class ContentMD4(MDStackLayout):
         final_row.add_widget(MDLabel(text="Final output:", halign='left', size_hint=(0.06, self.widget_height)))
         final_info = InfoTooltipButton(
             icon="information-outline",
-            tooltip_text="ggggggggggggggg",
+            tooltip_text="The final state displayed in little-endian (as typical).\n" \
+            "After each transformation the output registers update (H1, H2, H3, H4) <- (H1 + A, H2 + B, H3 + C, H4 + D)",
             size_hint=(None, self.widget_height * 4)
         )
         final_row.add_widget(final_info)
@@ -873,6 +950,306 @@ class ContentMD5(MDStackLayout):
             instance.text = '[7, 12, 17, 22]'
 
 
+class TabSHA1(MDStackLayout, MDTabsBase):
+    def __init__(self, orientation: str ='lr-tb', **kwargs):
+        super().__init__(**kwargs)
+        self.title="SHA-1"
+
+        scroll = MDScrollView(do_scroll_x=True, do_scroll_y=True)
+        content = ContentSHA1(orientation=orientation)
+
+        scroll.add_widget(content)
+        self.add_widget(scroll)
+
+
+class ContentSHA1(MDStackLayout):
+    def __init__(self, orientation: str ='lr-tb', **kwargs):
+        super().__init__(**kwargs)
+        self.orientation = 'lr-tb'
+        self.adaptive_height = True
+        self.padding = 20
+        # self.adaptive_width = True # RAM eater
+
+        self.widget_height = 0.03
+        self.sha = sha1.SHA1()
+        self.disable_calc = False
+
+        hello_label = MDLabel(text=f"SHA-1 algorithm", font_style="H4", size_hint=(0.55, self.widget_height * 4), halign="right", valign="middle")
+        hello_label.bind(size=hello_label.setter("text_size"))
+        self.add_widget(hello_label)
+
+        hello_info = InfoTooltipButton(
+            icon="information-outline",
+            tooltip_text="aaabbcc",
+            size_hint=(None, self.widget_height * 4),
+            halign='left'
+        )
+        self.add_widget(hello_info)
+
+        self.add_widget(MDIconButton(
+            icon="blank",
+            icon_color=(1, 1, 1, 0),
+            size_hint=(0.35, self.widget_height * 4),
+        ))
+
+        self.add_widget(MDIconButton(icon="theme-light-dark", size_hint=(None, self.widget_height * 4), on_release=self.toggle_theme, halign='right'))
+        self.add_widget(MDIconButton(icon="restore", size_hint=(None, self.widget_height * 4), on_release=self.reset_variables))
+        
+        # Chain constraints
+        chain_row = MDStackLayout(orientation='lr-tb', size_hint=(1, self.widget_height))
+        chain_row.add_widget(MDLabel(text="Enter chain constants:", size_hint=(0.09, self.widget_height)))
+        chain_info = InfoTooltipButton(
+            icon="information-outline",
+            tooltip_text="lalalala",
+            size_hint=(None, self.widget_height * 4)
+        )
+        chain_row.add_widget(chain_info)
+        self.add_widget(chain_row)
+        self.add_widget(MDLabel(text="h1:", halign='left', size_hint=(0.2, self.widget_height)))
+        self.add_widget(MDLabel(text="h2:", halign='left', size_hint=(0.2, self.widget_height)))
+        self.add_widget(MDLabel(text="h3:", halign='left', size_hint=(0.2, self.widget_height)))
+        self.add_widget(MDLabel(text="h4:", halign='left', size_hint=(0.2, self.widget_height)))
+        self.add_widget(MDLabel(text="h5:", halign='left', size_hint=(0.2, self.widget_height)))
+
+        h1_def = '67452301'
+        self.h1_ti = MDTextField(text=h1_def, multiline=False, size_hint=(0.2, self.widget_height), on_text_validate=self.update_chain_const)
+        self.add_widget(self.h1_ti)
+
+        h2_def = 'efcdab89'
+        self.h2_ti = MDTextField(text=h2_def, multiline=False, size_hint=(0.2, self.widget_height), on_text_validate=self.update_chain_const)
+        self.add_widget(self.h2_ti)
+
+        h3_def, h4_def = md4.chain_constraints(h1_def, h2_def)
+        self.h3_ti = MDTextField(text=h3_def, multiline=False, size_hint=(0.2, self.widget_height), on_text_validate=self.update_chain_const, readonly=True)
+        self.add_widget(self.h3_ti)
+
+        self.h4_ti = MDTextField(text=h4_def, multiline=False, size_hint=(0.2, self.widget_height), on_text_validate=self.update_chain_const, readonly=True)
+        self.add_widget(self.h4_ti)
+
+        h5_def = 'c3d2e1f0'
+        self.h5_ti = MDTextField(text=h5_def, multiline=False, size_hint=(0.2, self.widget_height), on_text_validate=self.update_chain_const)
+        self.add_widget(self.h5_ti)
+
+        # Additivie constaints
+        add_row = MDStackLayout(orientation='lr-tb', size_hint=(1, self.widget_height))
+        add_row.add_widget(MDLabel(text="Enter additive constants:", halign='left', size_hint=(0.1, self.widget_height)))
+        add_info = InfoTooltipButton(
+            icon="information-outline",
+            tooltip_text="bebebbe",
+            size_hint=(None, self.widget_height * 4)
+        )
+        add_row.add_widget(add_info)
+        self.add_widget(add_row)
+        self.add_widget(MDLabel(text="y1:", halign='left', size_hint=(0.25, self.widget_height)))
+        self.add_widget(MDLabel(text="y2:", halign='left', size_hint=(0.25, self.widget_height)))
+        self.add_widget(MDLabel(text="y3:", halign='left', size_hint=(0.25, self.widget_height)))
+        self.add_widget(MDLabel(text="y4:", halign='left', size_hint=(0.25, self.widget_height)))
+
+
+        y1_def = '5a827999'
+        self.y1_ti = MDTextField(text=y1_def, multiline=False, size_hint=(0.25, self.widget_height), on_text_validate=self.check_if_number)
+        self.add_widget(self.y1_ti)
+
+        y2_def = '6ed9eba1'
+        self.y2_ti = MDTextField(text=y2_def, multiline=False, size_hint=(0.25, self.widget_height), on_text_validate=self.check_if_number)
+        self.add_widget(self.y2_ti)
+
+        y3_def = '8f1bbcdc'
+        self.y3_ti = MDTextField(text=y3_def, multiline=False, size_hint=(0.25, self.widget_height), on_text_validate=self.check_if_number)
+        self.add_widget(self.y3_ti)
+
+        y4_def = 'ca62c1d6'
+        self.y4_ti = MDTextField(text=y4_def, multiline=False, size_hint=(0.25, self.widget_height), on_text_validate=self.check_if_number)
+        self.add_widget(self.y4_ti)
+
+        mess_row = MDStackLayout(orientation='lr-tb', size_hint=(1, self.widget_height))
+        mess_row.add_widget(MDLabel(text="Enter message to encrypt:", halign='left', size_hint=(0.1, self.widget_height)))
+        mess_info = InfoTooltipButton(
+            icon="information-outline",
+            tooltip_text="eeeeeeeeee",
+            size_hint=(None, self.widget_height * 4)
+        )
+        mess_row.add_widget(mess_info)
+        self.add_widget(mess_row)
+        self.message = MDTextField(text="Password to hash", size_hint=(0.8, self.widget_height))
+        self.add_widget(self.message)
+        
+        self.add_widget(MDRaisedButton(text="Enter", on_press=self.initialize, size_hint=(0.2, self.widget_height)))
+
+        self.add_widget(MDRaisedButton(text="Run one iteration",
+                               on_press=self.run_iter,
+                               size_hint=(0.5, self.widget_height)))
+        self.add_widget(MDRaisedButton(text="Run all",
+                               on_press=self.run_all,
+                               size_hint=(0.5, self.widget_height)))
+        
+        # Display results
+        reg_row = MDStackLayout(orientation='lr-tb', size_hint=(1, self.widget_height))
+        reg_row.add_widget(MDLabel(text="\nRegisters:", halign='left', size_hint=(0.05, self.widget_height)))
+        reg_info = InfoTooltipButton(
+            icon="information-outline",
+            tooltip_text="ffffffff",
+            size_hint=(None, self.widget_height * 30)
+        )
+        reg_row.add_widget(reg_info)
+        self.add_widget(reg_row)
+
+        self.add_widget(MDLabel(text="a:", halign='left', size_hint=(0.2, self.widget_height)))
+        self.add_widget(MDLabel(text="b:", halign='left', size_hint=(0.2, self.widget_height)))
+        self.add_widget(MDLabel(text="c:", halign='left', size_hint=(0.2, self.widget_height)))
+        self.add_widget(MDLabel(text="d:", halign='left', size_hint=(0.2, self.widget_height)))
+        self.add_widget(MDLabel(text="e:", halign='left', size_hint=(0.2, self.widget_height)))
+
+        self.a_ti = MDTextField(text=str(self.sha.a),
+                               multiline=False, size_hint=(0.2, self.widget_height), on_text_validate=self.update_reg, readonly=True)
+        self.add_widget(self.a_ti)
+
+        self.b_ti = MDTextField(text=str(self.sha.b),
+                               multiline=False, size_hint=(0.2, self.widget_height), on_text_validate=self.update_reg, readonly=True)
+        self.add_widget(self.b_ti)
+
+        self.c_ti = MDTextField(text=str(self.sha.c),
+                               multiline=False, size_hint=(0.2, self.widget_height), on_text_validate=self.update_reg, readonly=True)
+        self.add_widget(self.c_ti)
+
+        self.d_ti = MDTextField(text=str(self.sha.d),
+                               multiline=False, size_hint=(0.2, self.widget_height), on_text_validate=self.update_reg, readonly=True)
+        self.add_widget(self.d_ti)
+
+        self.e_ti = MDTextField(text=str(self.sha.e),
+                               multiline=False, size_hint=(0.2, self.widget_height), on_text_validate=self.update_reg, readonly=True)
+        self.add_widget(self.e_ti)
+
+        final_row = MDStackLayout(orientation='lr-tb', size_hint=(1, self.widget_height))
+        final_row.add_widget(MDLabel(text="Final output:", halign='left', size_hint=(0.06, self.widget_height)))
+        final_info = InfoTooltipButton(
+            icon="information-outline",
+            tooltip_text="ggggggggggggggg",
+            size_hint=(None, self.widget_height * 4)
+        )
+        final_row.add_widget(final_info)
+        self.add_widget(final_row)
+        
+        r = self.sha.get_registers()
+        self.r_l = [None for _ in range(40)]
+        for i in range(40):
+            self.r_l[i] = MDTextField(text=r[i], size_hint=(1/40, self.widget_height), multiline=False,  on_text_validate=self.update_out, readonly=True)
+            self.add_widget(self.r_l[i])
+
+    def update_chain_const(self, instance):
+        try:
+            if len(instance.text) > 8:
+                raise ValueError
+            int(instance.text, 16)
+        except ValueError:
+            self.show_popup("Not a valid 8-bit hexadecimal constant.")
+            instance.text = '00000000'
+            return
+        self.h3_ti.text, self.h4_ti.text = md4.chain_constraints(self.h1_ti.text, self.h2_ti.text)
+
+
+    def initialize(self, instance):
+        try:
+            self.sha = sha1.SHA1(self.message.text, self.h1_ti.text, self.h2_ti.text, self.h5_ti.text,
+                                            self.y1_ti.text, self.y2_ti.text, self.y3_ti.text, self.y4_ti.text)
+
+        except ValueError:
+            self.show_popup("The message can't be empty.")
+            return
+        self.disable_calc = False
+
+    def update_reg(self, instance):
+        self.a_ti.text = str(self.sha.a)
+        self.b_ti.text = str(self.sha.b)
+        self.c_ti.text = str(self.sha.c)
+        self.d_ti.text = str(self.sha.d)
+        self.e_ti.text = str(self.sha.e)
+
+    def update_out(self, instance):
+        r = self.ripemd.get_registers()
+        for i in range(40):
+            self.r_l[i].text = r[i]
+
+    def run_iter(self, instance):
+        if self.disable_calc:
+            self.show_popup("Calculations have been completed. Type a new password to hash and press enter to run again.")
+            return
+        try:
+            finished = self.sha.run_iter()
+        except AttributeError:
+            self.show_popup("The message hasn't been acknowledged. Type a new password to hash and press enter to start.")
+            return
+        self.a_ti.text = str(self.sha.a)
+        self.b_ti.text = str(self.sha.b)
+        self.c_ti.text = str(self.sha.c)
+        self.d_ti.text = str(self.sha.d)
+        self.e_ti.text = str(self.sha.e)
+        if finished:
+            self.disable_calc = True
+            r = self.sha.get_registers()
+            for i in range(40):
+                self.r_l[i].text = r[i]
+
+    def run_all(self, instance):
+        if self.disable_calc:
+            self.show_popup("Calculations have been completed. Type a new password to hash and press enter to run again.")
+            return
+        try:
+            self.sha.run_iter()
+        except AttributeError:
+            self.show_popup("The message hasn't been acknowledged. Type a new password to hash and press enter to start.")
+            return
+        Clock.schedule_interval(self.run_all_async, 0.05)
+
+    def run_all_async(self, dt):
+        finished = self.sha.run_iter()
+        self.a_ti.text = str(self.sha.a)
+        self.b_ti.text = str(self.sha.b)
+        self.c_ti.text = str(self.sha.c)
+        self.d_ti.text = str(self.sha.d)
+        self.e_ti.text = str(self.sha.e)
+        if finished:
+            self.disable_calc = True
+            r = self.sha.get_registers()
+            for i in range(40):
+                self.r_l[i].text = r[i]
+        return not finished
+    
+    def show_popup(self, label_text=str):
+        self.dialog = MDDialog(
+            title='Warning',
+            text=label_text,
+            buttons=[
+                MDFlatButton(text="OK", on_release=self.close_popup)
+            ],
+        )
+        self.dialog.open()
+
+    def close_popup(self, *args):
+        self.dialog.dismiss()
+
+    def toggle_theme(self, *args):
+        self.theme_cls.theme_style = "Dark" if self.theme_cls.theme_style == "Light" else "Light"
+
+    def reset_variables(self, *args):
+        self.h1_ti.text = '67452301'
+        self.h2_ti.text = 'efcdab89'
+        self.h5_ti.text = 'c3d2e1f0'
+        self.y1_ti.text = '5a827999'
+        self.y2_ti.text = '6ed9eba1'
+        self.y3_ti.text = '8f1bbcdc'
+        self.y4_ti.text = 'ca62c1d6'
+        self.message.text = "Password to hash"
+
+    def check_if_number(self, instance):
+        try:
+            if len(instance.text) > 8:
+                raise ValueError
+            int(instance.text, 16)
+        except ValueError:
+            self.show_popup("Not a valid 8-bit hexadecimal constant.")
+            instance.text = '00000000'
+
 
 class TabRIPEMD(MDStackLayout, MDTabsBase):
     def __init__(self, orientation: str ='lr-tb', **kwargs):
@@ -1506,9 +1883,10 @@ class MyTabbedPanel(MDBoxLayout):
         self.tabs = MDTabs()
         self.add_widget(self.tabs)
 
+        self.tabs.add_widget(WelocomePanel())
         self.tabs.add_widget(TabMD4())
         self.tabs.add_widget(TabMD5())
-        # self.tabs.add_widget(TabSHA1())
+        self.tabs.add_widget(TabSHA1())
         self.tabs.add_widget(TabRIPEMD())
 
 
@@ -1516,6 +1894,7 @@ class MyTabbedPanel(MDBoxLayout):
 class MyApp(MDApp):
 
     def build(self):
+        self.title = "HashFunEdu"
         self.theme_cls.primary_palette = np.random.choice(["Teal", "Amber", "DeepPurple", "Cyan", "Indigo", "Red", "Green"])
         self.theme_cls.theme_style = np.random.choice(["Light", "Dark"])
         Window.maximize()
