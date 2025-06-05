@@ -2018,6 +2018,183 @@ class ContentWhirlpool(MDStackLayout):
         self.theme_cls.theme_style = "Dark" if self.theme_cls.theme_style == "Light" else "Light"
 
 
+class TabBLAKE(MDStackLayout, MDTabsBase):
+    def __init__(self, orientation: str ='lr-tb', **kwargs):
+        super().__init__(**kwargs)
+        self.title="BLAKE"
+
+        scroll = MDScrollView(do_scroll_x=True, do_scroll_y=True)
+        content = ContentBLAKE(orientation=orientation)
+
+        scroll.add_widget(content)
+        self.add_widget(scroll)
+
+
+class ContentBLAKE(MDStackLayout):
+    def __init__(self, orientation: str ='lr-tb', **kwargs):
+        super().__init__(**kwargs)
+        self.orientation = 'lr-tb'
+        self.adaptive_height = True
+        self.padding = 20
+        # self.adaptive_width = True # RAM eater
+
+        self.widget_height = 0.03
+        self.disable_calc = False
+
+        self.alg = '0' * 128
+        self.version = 'blake2b'
+
+        hello_label = MDLabel(text=f"BLAKE algorithm", font_style="H4", size_hint=(0.55, self.widget_height * 4), halign="right", valign="middle")
+        hello_label.bind(size=hello_label.setter("text_size"))
+        self.add_widget(hello_label)
+
+        hello_info = InfoTooltipButton(
+            icon="information-outline",
+            tooltip_text="BLAKE2 was designed by Jean-Philippe Aumasson, Samuel Neves, Zooko Wilcox-O'Hearn, and Christian Winnerlein. It was published in 2012 as an improved version of the original BLAKE algorithm, which was a finalist in the NIST SHA-3 competition.\n"
+                        "BLAKE2 is a cryptographic hash function optimized for speed, security, and simplicity. It is faster than MD5, SHA-1, and SHA-2, while providing at least as much security.\n"
+                        "BLAKE2 comes in two main variants:\n"
+                        " - BLAKE2b: optimized for 64-bit platforms, produces digests up to 512 bits.\n"
+                        " - BLAKE2s: optimized for 8- to 32-bit platforms, produces digests up to 256 bits.\n"
+                        "Internal structure:\n"
+                        " - Based on the HAIFA construction and the local wide-pipe principle.\n"
+                        " - Uses the ChaCha permutation (a variant of the stream cipher) for mixing input.\n"
+                        " - Employs a 12-round compression function (BLAKE2b) or 10-round function (BLAKE2s).\n"
+                        " - Supports optional parameters including key, salt, personalization string, and tree hashing.\n",
+            size_hint=(None, self.widget_height * 4),
+            halign='left'
+        )
+        self.add_widget(hello_info)
+
+        self.add_widget(MDIconButton(
+            icon="blank",
+            icon_color=(1, 1, 1, 0),
+            size_hint=(0.35, self.widget_height * 4),
+        ))
+
+        self.add_widget(MDIconButton(icon="theme-light-dark", size_hint=(None, self.widget_height * 4), on_release=self.toggle_theme, halign='right'))
+
+
+        self.version = 'blake2b'
+
+        checkbox = MDCheckbox(group="blake", size_hint=(0.5 * 0.3, self.widget_height * 8))
+        checkbox.active = True
+        checkbox.label_text = 'blake2b'
+        checkbox.bind(active=self.on_checkbox_active)
+
+        label = MDLabel(
+            text="BLAKE2b",
+            halign='left',
+            valign = 'top',
+            size_hint=(0.5 * 0.7, self.widget_height * 8)
+        )
+
+        self.add_widget(checkbox)
+        self.add_widget(label)
+
+        checkbox = MDCheckbox(group="blake", size_hint=(0.5 * 0.3, self.widget_height * 8))
+        checkbox.label_text = 'blake2s'
+        checkbox.bind(active=self.on_checkbox_active)
+
+        label = MDLabel(
+            text='BLAKE2s',
+            halign='left',
+            valign = 'top',
+            size_hint=(0.5 * 0.7, self.widget_height * 8)
+        )
+
+        self.add_widget(checkbox)
+        self.add_widget(label)
+
+        mess_row = MDStackLayout(orientation='lr-tb', size_hint=(1, self.widget_height))
+        mess_row.add_widget(MDLabel(text="Enter message to encrypt:", halign='left', size_hint=(0.1, self.widget_height)))
+        mess_info = InfoTooltipButton(
+            icon="information-outline",
+            tooltip_text="The output digest size will be same length every time, regardless the length of this message.",
+            size_hint=(None, self.widget_height * 4)
+        )
+        mess_row.add_widget(mess_info)
+        self.add_widget(mess_row)
+        self.message = MDTextField(text="Password to hash", size_hint=(0.8, self.widget_height))
+        self.add_widget(self.message)
+        
+        self.add_widget(MDRaisedButton(text="Enter", on_press=self.initialize, size_hint=(0.2, self.widget_height)))
+
+
+        self.add_widget(MDRaisedButton(text="Run all",
+                               on_press=self.run_all,
+                               size_hint=(1, self.widget_height)))
+
+        final_row = MDStackLayout(orientation='lr-tb', size_hint=(1, self.widget_height * 6))
+        final_row.add_widget(MDLabel(text="Final output:", halign='left', size_hint=(0.06, self.widget_height * 6)))
+        final_info = InfoTooltipButton(
+            icon="information-outline",
+            tooltip_text="The final state displayed in little-endian (as typical).",
+            size_hint=(None, self.widget_height * 6)
+        )
+        final_row.add_widget(final_info)
+        self.add_widget(final_row)
+        
+        r = self.alg
+        self.r_l = [None for _ in range(128)]
+        for i in range(128):
+            self.r_l[i] = MDTextField(text=r[i], size_hint=(1/32, self.widget_height), multiline=False,  on_text_validate=self.update_out, readonly=True)
+            self.add_widget(self.r_l[i])
+
+    def initialize(self, instance):
+        try:
+            self.alg = hashlib.new(self.version, self.message.text.encode()).hexdigest()
+
+        except ValueError:
+            self.show_popup("The message can't be empty.")
+            return
+        self.disable_calc = False
+
+    def update_out(self, instance):
+        r = self.alg
+        if len(r) == 128:
+            for i in range(128):
+                self.r_l[i].text = r[i]
+        elif len(r) == 64:
+            for i in range(64):
+                self.r_l[i].text = '0'
+                self.r_l[i + 64].text = r[i]
+
+    def run_all(self, instance):
+        if self.disable_calc:
+            self.show_popup("Calculations have been completed. Type a new password to hash and press enter to run again.")
+            return
+        if self.alg == '0' * 128:
+            self.show_popup("The message hasn't been acknowledged. Type a new password to hash and press enter to start.")
+            return
+        r = self.alg
+        if len(r) == 128:
+            for i in range(128):
+                self.r_l[i].text = r[i]
+        elif len(r) == 64:
+            for i in range(64):
+                self.r_l[i].text = '0'
+                self.r_l[i + 64].text = r[i]
+    
+    def show_popup(self, label_text=str):
+        self.dialog = MDDialog(
+            title='Warning',
+            text=label_text,
+            buttons=[
+                MDFlatButton(text="OK", on_release=self.close_popup)
+            ],
+        )
+        self.dialog.open()
+
+    def close_popup(self, *args):
+        self.dialog.dismiss()
+
+    def toggle_theme(self, *args):
+        self.theme_cls.theme_style = "Dark" if self.theme_cls.theme_style == "Light" else "Light"
+
+    def on_checkbox_active(self, checkbox, value):
+        if value:
+            self.version = checkbox.label_text  # MDLabel is the second widget in layout
+
 
 
 class InfoTooltipButton(MDIconButton, MDTooltip):
@@ -2038,7 +2215,7 @@ class MyTabbedPanel(MDBoxLayout):
         self.tabs.add_widget(TabSHA1())
         self.tabs.add_widget(TabRIPEMD())
         self.tabs.add_widget(TabWhirlpool())
-
+        self.tabs.add_widget(TabBLAKE())
 
 
 class MyApp(MDApp):
